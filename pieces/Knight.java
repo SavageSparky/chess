@@ -19,12 +19,38 @@ public class Knight extends ChessPiece {
 
 
   @Override
-  public void movePiece(int toRow, int toColumn){
+  public boolean movePiece(int toRow, int toColumn){
+    try {
+      checkForChessPieceSpecificExceptions(toRow, toColumn);
+    }
+    catch(IllegalMoveException e) {
+      System.out.println(e.getMessage());
+      return false;
+    }
+    if(!inspectForCheckSelf(toRow, toColumn)) {
+      return false;
+    }
+    if(inspectForCheckAgainst()){
+      System.out.println("    ! CHECK !");
+    }
+    return true;
+  }
 
+  @Override
+  public boolean checkForChessPieceSpecificExceptions(int toRow, int toColumn) {
+    int rowDifference = Math.abs(this.getRowPosition() - toRow);
+    int columnDifference = Math.abs(this.getColumnPosition() - toColumn);
+    if(rowDifference > 2 || rowDifference < 1 || columnDifference > 2 || columnDifference < 1) {
+      throw new IllegalMoveException("Illegal Move");
+    }
+    if((rowDifference == 2 && columnDifference != 1) || (rowDifference == 1 && columnDifference !=2)) {
+      throw new IllegalMoveException("Illegal Move");
+    }
+    return false;
   }
 
   @Override
   public String toString(){
-    return " " + chessPieceType.toString() + (isTeamWhite? " W": " B") + " ";
+    return "  " + chessPieceType.toString() + (isTeamWhite? " W": " B") + "  ";
   }
 }

@@ -1,5 +1,6 @@
 package chess.pieces;
 
+import chess.board.Board;
 
 public abstract class ChessPiece {
   protected int rowPosition;
@@ -31,5 +32,37 @@ public abstract class ChessPiece {
   
   public abstract ChessPieceType getChessPieceType();
   public abstract boolean movePiece(int toRow, int toColumn);
+  public abstract boolean checkForChessPieceSpecificExceptions(int toRow, int toColumn);
+
+  protected boolean inspectForCheckSelf(int toRow, int toColumn) {
+    // Board.displayBoard();
+    int copyOfRowPosition = this.rowPosition;
+    int copyOfColumnPosition = this.columnPosition;
+    ChessPiece copyOfDestinationChessPiece = Board.getChessPiece(toRow, toColumn);
+    Board.setChessPiece(toRow, toColumn, this);
+    Board.setChessPiece(this.rowPosition, this.columnPosition, null);
+    this.rowPosition = toRow;
+    this.columnPosition = toColumn;
+    // Board.displayBoard();
+    if(Board.inspectAllOpponentPiecesForCheck(isTeamWhite)){
+      return true;
+    }
+    this.rowPosition = copyOfRowPosition;
+    this.columnPosition = copyOfColumnPosition;
+    Board.setChessPiece(rowPosition, columnPosition, Board.getChessPiece(toRow, toColumn));
+    Board.setChessPiece(toRow, toColumn, copyOfDestinationChessPiece);
+    return false;
+  }
+
+  protected boolean inspectForCheckAgainst() {
+    int[] kingPosition = this.isTeamWhite ? Board.getBlackKingPosition(): Board.getWhiteKingPosition();
+    try {
+      checkForChessPieceSpecificExceptions(kingPosition[0], kingPosition[1]);
+    }
+    catch(RuntimeException e) {
+      return false;
+    } 
+    return true;
+  }
 
 }

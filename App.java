@@ -18,7 +18,7 @@ public class App {
     boolean exceptionFlag = true;
     // loop till numbers are entered
     while(exceptionFlag) {
-      System.out.println("Input Format <fromRow fromColumn toRow toColumn>: ");
+      System.out.print("Input Format <fromRow fromColumn toRow toColumn>: ");
       int numberOfUnexecutedSteps = 4;
 
       try{
@@ -56,17 +56,17 @@ public class App {
   }
   
   public static void main(String[] args){
-    boolean checkMate = false;
     boolean isWhite = true; // player turn
-    while(checkMate) {
+    while(!Board.getCheckMate()) {
       Board.displayBoard();
       if(isWhite) {
-        System.out.print("\n    White's turn\n");
+        System.out.print("\n                WHITE's TURN\n");
         while(!getInput(isWhite));     // loop till valid values are entered
         isWhite = !isWhite;
       }
       else {
-        System.out.print("\n    Black's turn\n");
+        System.out.print("\n                BLACK's turn\n");
+        while(!getInput(isWhite));   
         isWhite = !isWhite;
       }
     }

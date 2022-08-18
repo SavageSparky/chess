@@ -20,65 +20,65 @@ public class Pawn extends ChessPiece {
 
   @Override
   public boolean movePiece(int toRow, int toColumn) {
-    if(checkForPawnExceptions(toRow, toColumn)) {
+    try {
+      checkForChessPieceSpecificExceptions(toRow, toColumn);
+    }catch(IllegalMoveException | PieceOnPathException e) {
+      System.out.println(e.getMessage());
       return false;
     }
-    Board.setChessPiece(toRow, toColumn, this);
-    Board.setChessPiece(this.rowPosition, this.columnPosition, null);
-    this.rowPosition = toRow;
-    this.columnPosition = toColumn;
+    if(!inspectForCheckSelf(toRow, toColumn)) {
+      return false;
+    }
+    if(inspectForCheckAgainst()){
+      System.out.println("    ! CHECK !");
+    }
     if((isTeamWhite && this.rowPosition == 0) && (!isTeamWhite && this.rowPosition == 7)) {
       promotePawn();
     }
     return true;
   }
 
-  private boolean checkForPawnExceptions(int toRow, int toColumn) {
+  @Override
+  public boolean checkForChessPieceSpecificExceptions(int toRow, int toColumn) {
     int rowDifference = this.rowPosition - toRow;
     int columnDifference = this.columnPosition - toColumn;
     ChessPiece destinationChessPiece = Board.getChessPiece(toRow, toColumn);
-    try {
-      if(columnDifference < -1 || columnDifference > 1) {
-        throw new IllegalMoveException("Pawn cannot move like that");
-      }
-      else if((columnDifference == -1 || columnDifference == 1) && (isTeamWhite == destinationChessPiece.isTeamWhite() || destinationChessPiece == null)) {
-        throw new IllegalMoveException("Illegal Move: Destination either your Piece or no Piece at all");
-      }else if(columnDifference == 0 && destinationChessPiece != null ){
-        throw new IllegalMoveException("Destination has other chess piece");
-      }
-
-      if(isTeamWhite) {
-        if(rowDifference != 1 || rowDifference != 2) {
-          throw new IllegalMoveException("Illegal Move");
-        }
-        else if((rowDifference == 2 ) && (columnDifference != 0 )) {
-          throw new IllegalMoveException("Illegal Move");
-        }
-        else if(rowDifference == 2 && isMoved) {
-          throw new IllegalMoveException("This Pawn can move only ONE STEP FORWARD");
-        }
-        else if(rowDifference == 2 && Board.getChessPiece(this.rowPosition-1, this.columnPosition) != null) {
-          throw new PieceOnPathException();
-        }
-      }
-      else {
-        if(rowDifference != -1 || rowDifference != -2) {
-          throw new IllegalMoveException("Illegal Move");
-        }
-        else if((rowDifference == -2 ) && (columnDifference != 0 )) {
-          throw new IllegalMoveException("Illegal Move");
-        }
-        else if(rowDifference == -2 && isMoved) {
-          throw new IllegalMoveException("This Pawn can move only ONE STEP FORWARD");
-        }
-        else if(rowDifference == -2 && Board.getChessPiece(this.rowPosition+1, this.columnPosition) != null) {
-          throw new PieceOnPathException();
-        }
-      }  
+    if(columnDifference < -1 || columnDifference > 1) {
+      throw new IllegalMoveException("Pawn cannot move like that");
     }
-    catch(IllegalMoveException | PieceOnPathException e) {
-      System.out.println(e.getMessage());
-      return false;
+    else if((columnDifference == -1 || columnDifference == 1) && destinationChessPiece == null) {
+      throw new IllegalMoveException("Illegal Move: Destination has no Piece at all");
+    }else if(columnDifference == 0 && destinationChessPiece != null ){
+      throw new IllegalMoveException("Destination has other chess piece");
+    }
+
+    if(isTeamWhite) {
+      if(rowDifference < 1 || rowDifference > 2) {
+        throw new IllegalMoveException("Illegal Move1");
+      }
+      else if((rowDifference == 2 ) && (columnDifference != 0 )) {
+        throw new IllegalMoveException("Illegal Move2");
+      }
+      else if(rowDifference == 2 && isMoved) {
+        throw new IllegalMoveException("This Pawn can move only ONE STEP FORWARD");
+      }
+      else if(rowDifference == 2 && Board.getChessPiece(this.rowPosition-1, this.columnPosition) != null) {
+        throw new PieceOnPathException();
+      }
+    }
+    else {
+      if(rowDifference > -1 || rowDifference < -2) {
+        throw new IllegalMoveException("Illegal Move3");
+      }
+      else if((rowDifference == -2 ) && (columnDifference != 0 )) {
+        throw new IllegalMoveException("Illegal Move4");
+      }
+      else if(rowDifference == -2 && isMoved) {
+        throw new IllegalMoveException("This Pawn can move only ONE STEP FORWARD");
+      }
+      else if(rowDifference == -2 && Board.getChessPiece(this.rowPosition+1, this.columnPosition) != null) {
+        throw new PieceOnPathException();
+      }
     }
     return true;
   }
@@ -90,6 +90,6 @@ public class Pawn extends ChessPiece {
 
   @Override
   public String toString(){
-    return "  " + chessPieceType.toString() + (isTeamWhite? " W": " B") + "  ";
+    return "   " + chessPieceType.toString() + (isTeamWhite? " W": " B") + "   ";
   }
 }
